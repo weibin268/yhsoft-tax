@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?><!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="yhsoft.tax.modules.core.mapper.Test">
+    <select id="getList" resultType="map">
+      select '1' as id,'zwb' as name from dual
+    </select>
+</mapper>

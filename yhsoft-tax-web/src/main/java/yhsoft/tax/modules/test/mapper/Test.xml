@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?><!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zhuang.upms.modules.test.mapper.Test">
+
+    <select id="getUser" resultType="yhsoft.tax.modules.core.model.UserExt">
+        select * from sys_user where login_id='@env{user.loginId}' and id='@env{user.userId}'
+    </select>
+
+    <select id="testPermission" resultType="yhsoft.tax.modules.core.model.UserExt">
+        select * from sys_user where id='@env{user.userId}' and @permission{core:user:query?1=2}
+    </select>
+</mapper>
+

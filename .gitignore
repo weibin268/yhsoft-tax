@@ -1,0 +1,17 @@
+# Created by .ignore support plugin (hsz.mobi)
+
+.idea/*
+lib/*.iml
+*.iml
+out/*
+logs/*
+
+yhsoft-common/*.iml
+yhsoft-common/target/*
+
+yhsoft-ocr/*.iml
+yhsoft-ocr/target/*
+
+yhsoft-tax-web/*iml
+yhsoft-tax-web/target/*
+yhsoft-tax-web/logs/*

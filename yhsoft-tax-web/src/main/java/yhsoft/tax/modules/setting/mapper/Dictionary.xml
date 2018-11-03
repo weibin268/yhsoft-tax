@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?><!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zhuang.upms.modules.setting.mapper.Dictionary">
+
+    <select id="getTreeNodes" resultType="map">
+
+        SELECT id,name,'root' as pId,1 as level,1 as open
+        from sys_dictionary
+        WHERE status!=-1
+        ORDER BY seq
+
+    </select>
+
+    <select id="selectPage" resultType="map">
+
+        SELECT * from sys_dictionary a
+        WHERE a.status!=-1
+        <if test="code!=''">
+            and code like concat('%',#{code},'%')
+        </if>
+        <if test="name!=''">
+            and name like concat('%',#{name},'%')
+        </if>
+        <if test="status!=''">
+            and status=#{status}
+        </if>
+
+    </select>
+
+
+    <select id="getById" resultType="yhsoft.tax.modules.setting.model.Dictionary">
+        select a.*
+        from sys_dictionary a
+        where a.status!=-1 AND a.id=#{id}
+    </select>
+
+
+    <select id="existsDictionaryCode" resultType="int">
+        SELECT count(*) from sys_dictionary where status=1 and code=#{code}
+        <if test="selfId!=null and selfId!=''">
+            and id!=#{selfId}
+        </if>
+    </select>
+
+    <update id="deleteById">
+
+        UPDATE sys_dictionary SET status = -1,modified_by=#{ModifiedBy},modified_time=#{ModifiedTime}
+        where id=#{id}
+
+    </update>
+
+    <select id="existsDictionaryItemCode" resultType="int">
+        SELECT count(*) from sys_dictionary_item where status=1 and code=#{code}
+        <if test="selfId!=null and selfId!=''">
+            and id!=#{selfId}
+        </if>
+    </select>
+
+    <select id="selectPage4Item" resultType="map">
+
+        SELECT * from sys_dictionary_item a
+        WHERE a.status!=-1 and a.dictionary_id=#{dictionaryId}
+
+    </select>
+
+
+    <select id="getItemById" resultType="yhsoft.tax.modules.setting.model.DictionaryItem">
+        select a.*
+        from sys_dictionary_item a
+        where a.status!=-1 AND a.id=#{id}
+    </select>
+
+
+    <update id="deleteItemById">
+
+        UPDATE sys_dictionary_item SET status = -1,modified_by=#{ModifiedBy},modified_time=#{ModifiedTime}
+        where id=#{id}
+
+    </update>
+
+    <select id="getDictionaryItemInfoListByCode" resultType="yhsoft.tax.modules.setting.model.DictionaryItemInfo">
+
+        select a.code,a.text,a.seq
+        from sys_dictionary_item a
+        INNER JOIN sys_dictionary b on a.dictionary_id=b.id
+        where a.status=1
+        AND b.status!=-1
+        and b.code=#{code}
+        ORDER by a.seq
+
+    </select>
+
+
+</mapper>

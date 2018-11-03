@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common/base::headerFragment('')">
+
+</head>
+
+<body>
+<div class="dlg-form">
+    <blockquote class="layui-elem-quote" style="display: none;">
+        <div class="search-form">
+            <form id="form1" class="layui-form">
+                <input type="hidden" name="dictionaryId" th:value="${param.id}"/>
+            </form>
+        </div>
+    </blockquote>
+    <table id="table1" class="layui-table" _formId="#form1" _toolbar="#toolbar1" lay-data="{height:'full-50'}"
+           _sql="zhuang.upms.modules.setting.mapper.Dictionary.selectPage4Item" _order="seq">
+        <thead>
+        <tr>
+            <th lay-data="{field:'seq', width:60}">序号</th>
+            <th lay-data="{field:'code', width:150}">编码</th>
+            <th lay-data="{field:'text', width:150}">文本</th>
+            <th lay-data="{field:'description'}">描述</th>
+            <th lay-data="{field:'status', width:60,templet:'#tplStatus' }">状态</th>
+            <th lay-data="{fixed: 'right', width:200, align:'center', toolbar: '#toolbar2'}">操作</th>
+        </tr>
+        </thead>
+    </table>
+</div>
+</body>
+
+<script type="text/html" id="toolbar1">
+    <th:block th:if="${canAdd}==true">
+        <div class="layui-btn-container">
+            <button class="layui-btn layui-btn-sm" onclick="return openAdd();">新增</button>
+        </div>
+    </th:block>
+</script>
+
+<script type="text/html" id="tplStatus">
+    {{# if(d.status==1){ }}
+    启用
+    {{# }else if(d.status==0){ }}
+    禁用
+    {{# }else{ }}
+
+    {{# } }}
+</script>
+
+<script type="text/html" id="toolbar2">
+    <a class="layui-btn layui-btn-sm" lay-event="view">查看</a>
+    <th:block th:if="${canModify}==true">
+        <a class="layui-btn layui-btn-sm" lay-event="edit">修改</a>
+    </th:block>
+    <th:block th:if="${canDelete}==true">
+        <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete">删除</a>
+    </th:block>
+</script>
+
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    zwb.util.lay.initTable();
+    layui.use(['form', 'table', 'layer'], function () {
+        var table = layui.table;
+        var layer = layui.layer;
+
+        table.on('tool(table1)', function (obj) {
+            if (obj.event == "edit") {
+                zwb.util.lay.openDialog('dictionary_item_edit?id=' + obj.data.id, "700px", "400px", null, {title: "子项编辑"});
+            } else if (obj.event == "view") {
+                zwb.util.lay.openDialog('dictionary_item_edit?isView=1&id=' + obj.data.id, "700px", "400px", function (index, layero) {
+                    zwb.util.lay.closeDialog(index);
+                }, {title: "子项查看", btn: ['关闭']});
+
+            } else if (obj.event == "delete") {
+                zwb.util.lay.confirm("确认删除？", function () {
+                    var id = obj.data.id;
+                    zwb.util.post("/setting/dictionary/deleteItem", {id: id}, function (data) {
+                        if (!zwb.util.lay.handleException(data)) return false;
+                        zwb.util.lay.reloadTable();
+                    })
+                });
+            }
+        });
+    });
+
+    function openAdd() {
+        zwb.util.lay.openDialog('dictionary_item_edit?dictionaryId=' + $("[name=dictionaryId]").val(),
+            "700px", "400px",
+            null, {title: "子项新增"}
+        );
+    };
+    /*]]>*/
+</script>
+</html>

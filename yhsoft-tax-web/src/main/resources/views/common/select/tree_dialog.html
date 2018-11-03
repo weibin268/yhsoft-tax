@@ -1,0 +1,53 @@
+<div xmlns:th="http://www.thymeleaf.org">
+    <div th:replace="common/base::headerFragment('')">
+    </div>
+    <link rel="stylesheet" type="text/css" th:href="@{/js/zTree/css/zTreeStyle/zTreeStyle.css}"/>
+    <script type="text/javascript" th:src="@{/js/zTree/js/jquery.ztree.all.js}"></script>
+
+    <div id="form_select_dialog_tree">
+        <div style="height: 70%;overflow-y: auto;">
+            <ul id="selectTree" class="ztree"></ul>
+        </div>
+        <div class="selected-container" style="height: 28%;">
+            <ul>
+            </ul>
+        </div>
+    </div>
+
+    <script type="text/javascript" th:inline="javascript">
+        /*<![CDATA[*/
+        $(function () {
+            var sqlId = /*[[${#httpServletRequest.getParameter('sqlId')}]]*/null;
+            var isSingle = /*[[${#httpServletRequest.getParameter('isSingle')}]]*/null;
+            var tree = zwb.util.ui.renderZTree("selectTree", sqlId,
+                {
+                    isAsync: true,
+                    onDblClickHandler: function (event, treeId, treeNode) {
+                        var count = $("#form_select_dialog_tree").find(".selected-container ul li[val=" + treeNode.id + "]").length;
+                        if (count > 0) return;
+                        var $li = $("<li>");
+                        $li.html(treeNode.name);
+                        $li.attr("val", treeNode.id);
+                        $li.attr("title", "双击删除");
+                        $li.dblclick(function () {
+                            $(this).remove();
+                        });
+                        $ul = $("#form_select_dialog_tree").find(".selected-container ul");
+                        if (isSingle) {
+                            $ul.html("");
+                        }
+                        $ul.append($li);
+                    }
+                });
+        });
+
+        function getSelectedArray() {
+            var arr = [];
+            $("#form_select_dialog_tree").find(".selected-container ul li").each(function () {
+                arr.push({text: $(this).html(), value: $(this).attr("val")});
+            });
+            return arr;
+        };
+        /*]]>*/
+    </script>
+</div>

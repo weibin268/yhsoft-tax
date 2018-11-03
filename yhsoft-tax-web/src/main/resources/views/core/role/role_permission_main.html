@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common/base::headerFragment('')">
+
+</head>
+
+<link rel="stylesheet" type="text/css" th:href="@{/js/zTree/css/zTreeStyle/zTreeStyle.css}"/>
+
+<script type="text/javascript" th:src="@{/js/zTree/js/jquery.ztree.all.js}"></script>
+
+<style type="text/css">
+    .ztree li span.button.switch.level0 {
+        visibility: hidden;
+        width: 1px;
+    }
+
+    #permissionTree_1_check {
+        visibility: hidden;
+    }
+
+    .ztree li ul.level0 {
+        padding: 0;
+        background: none;
+    }
+</style>
+
+<body>
+<div>
+    <ul id="permissionTree" class="ztree"></ul>
+</div>
+</body>
+
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    var roleId = /*[[${#httpServletRequest.getParameter('roleId')}]]*/null;
+    var permissionTree;
+
+    layui.use(['form'], function () {
+    });
+
+    $(function () {
+        permissionTree = zwb.util.ui.renderZTree("permissionTree", "zhuang.upms.modules.core.mapper.Permission.getTreeNodes4Role",
+            {
+                isAsync: false,
+                onClickHandler: function (event, treeId, treeNode) {
+
+                    if (treeNode.level == 0) {
+                        $("[name=orgId]").val("");
+                    } else {
+                        $("[name=orgId]").val(treeNode.id);
+                    }
+                    f_searchDatagrid();
+
+                }, rootName: "系统权限",
+                showCheck: true,
+                bizKey: roleId,
+                chkboxType: {"Y": "ps", "N": "s"}
+            });
+    });
+
+    function getSelectedPermissionIds() {
+        var arr = [];
+        var nodes = permissionTree.getCheckedNodes();
+        for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].id != "root") {
+                arr.push(nodes[i].id);
+            }
+        }
+        return arr;
+    }
+
+    function doSave(index, layero, originOpener) {
+        var permissionIds = getSelectedPermissionIds();
+        zwb.util.post("/core/role/setPermissions", zwb.util.getPostData({
+            id: roleId,
+            idList: permissionIds
+        }), function (data) {
+            if (!zwb.util.lay.handleException(data)) return false;
+            parent.layui.layer.close(index);
+        });
+    };
+    /*]]>*/
+</script>
+</html>

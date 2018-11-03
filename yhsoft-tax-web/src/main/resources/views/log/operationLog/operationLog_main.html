@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common/base::headerFragment('操作日志列表')">
+
+</head>
+
+<body>
+<div class="search-form">
+    <blockquote class="layui-elem-quote">
+        <form id="form1" class="layui-form">
+            <div class="layui-inline">
+                <label class="layui-form-label">登录账号：</label>
+                <div class="layui-input-inline">
+                    <input name="userLoginId" class="layui-input" type="text" style="width:150px;"/>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">登录姓名：</label>
+                <div class="layui-input-inline">
+                    <input name="userName" class="layui-input" type="text" style="width:150px;"/>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">模块名称：</label>
+                <div class="layui-input-inline">
+                    <input name="moduleName" class="layui-input" type="text" style="width:180px;"/>
+                </div>
+            </div>
+            <div class="layui-inline">
+                <label class="layui-form-label">操作时间：</label>
+                <div class="layui-input-inline">
+                    <input id="startTime" name="startTime" class="layui-input" type="text" style="width:100px;"/>
+                </div>
+                至
+                <div class="layui-input-inline">
+                    <input id="endTime" name="endTime" class="layui-input" type="text" style="width:100px;"/>
+                </div>
+            </div>
+            <div class="layui-inline search-form-button">
+                <div class="layui-input-inline">
+                    <button class="layui-btn" onclick="return zwb.util.lay.reloadTable('table1')"><i
+                            class="layui-icon">&#xe615;</i></button>
+                </div>
+            </div>
+        </form>
+    </blockquote>
+</div>
+<div class="data-list">
+    <table id="table1" class="layui-table" _formId="#form1"
+           _sql="zhuang.upms.modules.log.mapper.OperationLog.selectPage"
+           _order="createdTime desc" lay-data="{height:'full-140'}">
+        <thead>
+        <tr>
+            <th lay-data="{field:'userLoginId', width:120}">操作用户账号</th>
+            <th lay-data="{field:'userName', width:120}">操作用户名</th>
+            <th lay-data="{field:'moduleName', width:200}">模块名称</th>
+            <th lay-data="{field:'actionName', width:120, align:'center'}">操作名称</th>
+            <th lay-data="{field:'dataInfo'}">数据信息</th>
+            <th lay-data="{field:'createdTime', width:160, align:'center'}">操作时间</th>
+            <!--<th lay-data="{fixed: 'right', width:200, align:'center', toolbar: '#toolbar1'}">操作</th>-->
+        </tr>
+        </thead>
+    </table>
+</div>
+</body>
+
+<script type="text/html" id="toolbar1">
+    <a class="layui-btn layui-btn-sm" lay-event="view">查看</a>
+    <th:block th:if="${canModify}==true">
+        <a class="layui-btn layui-btn-sm" lay-event="edit">修改</a>
+    </th:block>
+    <th:block th:if="${canDelete}==true">
+        <a class="layui-btn layui-btn-danger layui-btn-sm" lay-event="delete">删除</a>
+    </th:block>
+</script>
+
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    zwb.util.lay.initTable();
+    layui.use(['form', 'table', 'layer', 'laydate'], function () {
+        var table = layui.table;
+        var layer = layui.layer;
+        var laydate = layui.laydate;
+
+        table.on('tool(table1)', function (obj) {
+            if (obj.event == "edit") {
+                zwb.util.lay.openDialog('operationLog_edit?id=' + obj.data.id, "700px", "480px", null, {title: "操作日志编辑"});
+            } else if (obj.event == "view") {
+                zwb.util.lay.openDialog('operationLog_edit?isView=1&id=' + obj.data.id, "700px", "480px", function (index, layero) {
+                    zwb.util.lay.closeDialog(index);
+                }, {title: "操作日志查看", btn: ['关闭']});
+            } else if (obj.event == "delete") {
+                zwb.util.lay.confirm("确认删除？", function () {
+                    var id = obj.data.id;
+                    zwb.util.post("/log/operationLog/delete", {id: id}, function (data) {
+                        if (!zwb.util.lay.handleException(data)) return false;
+                        zwb.util.lay.reloadTable();
+                    })
+                });
+            }
+        });
+
+        laydate.render({elem: '#startTime'});
+        laydate.render({elem: '#endTime'});
+    });
+    /*]]>*/
+</script>
+</html>

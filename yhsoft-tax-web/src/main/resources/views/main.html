@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="common/base::headerFragment('后台首页')">
+
+</head>
+
+<style type="text/css">
+    .left-menu-toggle {
+        position: absolute;
+        cursor: pointer;
+        z-index: 19940201;
+        left: 200px;
+        color: white;
+        text-align: center;
+        width: 20px;
+        height: 30px;
+        background-color: #4E5465;
+        line-height: 30px;
+        top: 25%;
+    }
+
+    .left-menu-toggle:hover {
+        background-color: #7b8192;
+    }
+</style>
+
+<body>
+<div class="layui-layout layui-layout-admin">
+    <div class="layui-header">
+        <div class="layui-logo" th:text="${systemProperties.systemName}">通用权限管理系统</div>
+
+        <div class="left-menu-toggle">
+            <i class="layui-icon" style="font-size: 20px;" onclick="toggleLeftMenu()">&#xe671;</i>
+        </div>
+
+        <ul id="ulTopMenu" class="layui-nav layui-layout-left">
+
+            <!--/*@thymesVar id="topMenus" type="java.util.List"*/-->
+            <li class="layui-nav-item" th:each="topMenu : ${topMenus}">
+                <a href="javascript:void(0)" th:onclick="'javascript:showLeftMenu(this,\''+${topMenu.menuId}+'\');'"
+                   th:text="${topMenu.menuName}"></a>
+            </li>
+
+        </ul>
+        <ul class="layui-nav layui-layout-right">
+            <li class="layui-nav-item">
+                <a href="javascript:;" th:text="${currentUserInfo.userName}">
+                </a>
+                <dl class="layui-nav-child">
+                    <dd><a href="javascript:void(0)" onclick="showBaseInfo();">基本资料</a></dd>
+                    <dd><a href="javascript:void(0)" onclick="changePassword();">密码修改</a></dd>
+                </dl>
+            </li>
+            <li class="layui-nav-item">
+                <a th:href="@{login/logout}">退出</a>
+            </li>
+        </ul>
+    </div>
+
+    <div id="divLeftMenu" class="layui-side layui-bg-black">
+        <div class="layui-side-scroll">
+            <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+            <ul id="ulLeftMenu" class="layui-nav layui-nav-tree" lay-shrink="all" lay-filter="test">
+                <li th:each="pMenu : ${leftParentMenus}" th:name="${pMenu.getParentId()}"
+                    class="layui-nav-item" style="display: none;">
+                    <a class=""  href="javascript:;" th:text="${pMenu.menuName}" onclick="clickFirstChild(this)"></a>
+                    <dl class="layui-nav-child">
+                        <dd th:each="sMenu : ${mainService.getMainMenus(leafMenusLevel, pMenu.getMenuId())}">
+                            <a style="margin-left: 10px;font-size: 13px;height: 35px;" href="javascript:;"
+                               th:onclick="'openPage(\''+${sMenu.getMenuName()}+'\',\''+${sMenu.getMenuUrl()}+'\')'"
+                               th:text="${sMenu.menuName}">
+                            </a>
+                        </dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="divMainBody" class="layui-body" style="bottom: 0;overflow: hidden;">
+        <iframe id="bodyFrame" scrolling="auto" frameborder="0" src="" style="width:100%;height:100%;"></iframe>
+    </div>
+</div>
+</body>
+
+<script type="text/javascript">
+    layui.use(['element', 'layer'], function () {
+    });
+
+    $(function () {
+        //顶部菜单默认选中第一个
+        $("#ulTopMenu li:first").addClass("layui-this");
+        $("#ulTopMenu li:first a").click();
+    });
+
+    function openPage(name, url) {
+        $("#bodyFrame").attr("src", zwb.settings.contextPath + url);
+    }
+
+    function showLeftMenu(self, menuId) {
+        $("#ulLeftMenu li").hide();
+        $("[name=" + menuId + "]").show();
+
+        //左边菜单默认选中第一个
+        $("#ulLeftMenu li" + "[name=" + menuId + "]" + ":first").addClass("layui-nav-itemed");
+        $("#ulLeftMenu li" + "[name=" + menuId + "]" + ":first").find("dd:first").addClass("layui-this").find("a").click();
+    }
+
+    function toggleLeftMenu() {
+        var leftWidth = $("#divLeftMenu").width();
+        if (leftWidth > 0) {
+            $("#divMainBody").animate({
+                left: 0
+            });
+            $("#divLeftMenu").animate({
+                width: 0
+            });
+        } else {
+            $("#divMainBody").animate({
+                left: "200px"
+            });
+            $("#divLeftMenu").animate({
+                width: "200px"
+            });
+        }
+    }
+
+    function clickFirstChild(self) {
+        $(self).parent().find("dl dd:first a").click();
+    }
+
+    function changePassword() {
+        var id = '[[${currentUserInfo.userId}]]';
+        zwb.util.lay.openDialog("/core/user/user_passwd_change?id=" + id, "360px", "270px", null, {title: "密码修改"});
+    }
+
+    function showBaseInfo() {
+        var id = '[[${currentUserInfo.userId}]]';
+        zwb.util.lay.openDialog("/core/user/user_base_info?id=" + id, "700px", "300px", null, {title: "基础信息"});
+    }
+</script>
+</html>

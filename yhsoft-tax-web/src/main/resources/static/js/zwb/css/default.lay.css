@@ -1,0 +1,32 @@
+.ztree * {
+    font-size: 13px !important;
+}
+
+.dlg-form {
+    margin-top: 10px;
+}
+
+.search-form .layui-form-label {
+    width: auto;
+}
+
+.search-form .search-form-button {
+    margin-left: 20px;
+}
+
+.search-form .layui-inline {
+    margin-bottom: 8px;
+}
+
+.search-form .layui-elem-quote {
+    padding-bottom: 7px;
+    margin-bottom: 0px;
+}
+
+.data-list .layui-table {
+    margin-top: 0px;
+}
+
+.data-list .layui-table-view {
+    margin-top: 0px;
+}

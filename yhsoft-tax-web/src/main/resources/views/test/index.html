@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="common/base::headerFragment('测试')"></head>
+
+<body>
+
+    <span th:onclick="'alert(\''+${zwb}+'\')'">aa</span>
+    <span th:text="${host}"></span>
+
+    <th:block th:text="${#httpServletRequest.getParameter('zwb')}"></th:block>
+
+    <button th:onclick="'javascript:onPost()'" >post</button>
+
+    <div th:text="${delete}"></div>
+
+<script type="text/javascript" th:inline="javascript">
+
+    function onPost() {
+        zwb.util.post("test/post",{id:12,name:"zwb"},function (aa) {
+
+            debugger;
+        })
+    }
+
+</script>
+</body>
+</html>

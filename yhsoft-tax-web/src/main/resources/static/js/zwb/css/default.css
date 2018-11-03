@@ -1,0 +1,68 @@
+body
+{
+    overflow: auto;
+}
+
+
+.selected-container {
+    border: 1px solid #CCC;
+    overflow: auto;
+    margin-bottom: 2px;
+    padding: 0px;
+}
+
+.selected-container ul {
+    list-style: none;
+    display: block;
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+}
+
+.selected-container ul li {
+    font-size: 13px;
+    float: left;
+    cursor: pointer;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+    color: #468847;
+    margin: 2px 3px;
+    padding: 2px 5px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+
+
+.ztree-disable-root li span.button.switch.level0 {
+    visibility: hidden;
+    width: 1px;
+}
+
+.ztree-disable-root li ul.level0 {
+    padding: 0;
+    background: none;
+}
+
+
+.ztree-container
+{
+    overflow: auto;
+    margin-bottom: 0;
+}
+
+.ztree-container .layui-elem-field
+{
+    margin-bottom: 0;
+}
+
+.webuploader-container
+{
+    display:inline;
+    width: auto;
+}
+
+.webuploader-pick{
+    padding: 5px;
+}

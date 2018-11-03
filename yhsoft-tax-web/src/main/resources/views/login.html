@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="common/base::headerFragment('登录页面')">
+    <meta charset="UTF-8"/>
+    <title>static</title>
+
+    <link rel="stylesheet" type="text/css" href="../static/js/layui/css/layui.css"/>
+    <link rel="stylesheet" type="text/css" href="../static/js/base/default.css}"/>
+    <link rel="stylesheet" type="text/css" href="../static/js/base/default_lay.css}"/>
+
+    <script type="text/javascript" src="../static/js/jquery/jquery.js"></script>
+    <script type="text/javascript" src="../static/js/base/config.js"></script>
+    <script type="text/javascript" src="../static/js/layui/layui.js"></script>
+    <script type="text/javascript" src="../static//js/base/utils.js"></script>
+    <script type="text/javascript" src="../static//js/base/utils_lay.js"></script>
+</head>
+
+<style type="text/css">
+    .panel-title {
+        font-size: 16px;
+    }
+
+    .panel-header {
+        padding: 10px;
+    }
+</style>
+
+<script type="text/javascript">
+    layui.use(['form'], function () {
+
+    });
+    jQuery(function () {
+        $("#btnLogin").bind("click", function () {
+            zwb.util.lay.validateForm("loginForm", function (data) {
+                zwb.util.post("/login/login", {
+                    loginId: $("#loginId").val(),
+                    password: $("#password").val(),
+                    validateCode: $("#validateCode").val()
+                }, function (data) {
+                    if (!zwb.util.lay.handleException(data)) return false;
+                    top.location.href = zwb.settings.contextPath + "/main";
+                })
+            });
+        });
+        $("#imgValidateCode").click(function () {
+            refreshValidateCode();
+        });
+        refreshValidateCode();
+    });
+
+    function refreshValidateCode() {
+        var url = zwb.settings.contextPath + "/common/validate-code/getValidateCodeImage?v=" + new Date();
+        $("#imgValidateCode").attr("src", url);
+    };
+</script>
+
+<body>
+<div style="margin:150px auto auto auto; width: 400px;height: auto;">
+    <fieldset class="layui-elem-field">
+        <legend>系统登录</legend>
+        <div class="layui-field-box" style="padding: 30px 50px;">
+            <form id="loginForm" class="layui-form" method="post" data-options="novalidate:true">
+                <div style="margin-bottom:10px">
+                    <input id="loginId" name="loginId" class="layui-input" lay-verify="required" placeholder="用户名"
+                           style="width:100%;padding:12px"/>
+                </div>
+                <div style="margin-bottom:10px">
+                    <input id="password" name="password" class="layui-input" type="password"
+                           style="width:100%;padding:12px" placeholder="密码"
+                           lay-verify="pass,required"/>
+                </div>
+                <div style="margin-bottom:10px;height: 40px;">
+                    <input id="validateCode" name="validateCode" class="layui-input" lay-verify="required"
+                           placeholder="验证码"
+                           style="width:100%;padding:12px;"/>
+                    <img id="imgValidateCode" src="" style="position: relative;top:-34px;left: 200px;"/>
+                </div>
+                <div>
+                    <a href="#" id="btnLogin" class="layui-btn" style="width:100%;">
+                        登录
+                    </a>
+                </div>
+            </form>
+        </div>
+    </fieldset>
+</div>
+</body>
+</html>

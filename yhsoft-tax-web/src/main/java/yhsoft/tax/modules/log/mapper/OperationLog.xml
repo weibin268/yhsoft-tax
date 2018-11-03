@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?><!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zhuang.upms.modules.log.mapper.OperationLog">
+
+    <select id="selectPage" resultType="map">
+        select
+            a.id as id,
+            a.user_id as userId,
+            a.user_login_id as userLoginId,
+            a.user_name as userName,
+            a.module as module,
+            a.module_name as moduleName,
+            a.action as action,
+            a.action_name as actionName,
+            a.data_info as dataInfo,
+            date_format(a.created_time,'%Y-%m-%d %H:%i:%s') as createdTime,
+            null as lastColumn
+        from sys_operation_log a
+        where 1=1
+        <if test="userLoginId!=''">
+            and a.user_login_id like concat('%',#{userLoginId},'%')
+        </if>
+        <if test="userName!=''">
+            and a.user_name like concat('%',#{userName},'%')
+        </if>
+        <if test="moduleName!=''">
+            and a.module_name like concat('%',#{moduleName},'%')
+        </if>
+        <if test="startTime!=''">
+            and a.created_time>=concat(#{startTime},' 00:00:00')
+        </if>
+        <if test="endTime!=''">
+            <![CDATA[
+            and a.created_time<=concat(#{endTime},' 23:59:59')
+        ]]>
+        </if>
+        and @permission{log:operationLog:query?1=2}
+    </select>
+
+    <select id="getById" resultType="yhsoft.tax.modules.log.model.OperationLog">
+        select a.*
+        from sys_operation_log a
+        where a.id=#{id}
+    </select>
+
+    <update id="deleteById">
+        UPDATE sys_operation_log SET status = -1,modified_by=#{ModifiedBy},modified_time=#{ModifiedTime}
+        where id=#{id}
+    </update>
+</mapper>

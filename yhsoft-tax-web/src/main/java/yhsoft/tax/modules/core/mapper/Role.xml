@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?><!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zhuang.upms.modules.core.mapper.Role">
+
+    <select id="selectPage" resultType="map">
+        select id,name,description,status from
+        sys_role
+        where status!=-1
+        <if test="name!=''">
+            and name like concat('%',#{name},'%')
+        </if>
+        <if test="description!=''">
+            and description like concat('%',#{description},'%')
+        </if>
+    </select>
+
+    <select id="getById" resultType="yhsoft.tax.modules.core.model.Role">
+		select a.*
+		from sys_role a
+		where a.status!=-1 AND a.id=#{id}
+
+	</select>
+
+
+    <update id="deleteById">
+
+        UPDATE sys_role SET status = -1,modified_by=#{ModifiedBy},modified_time=#{ModifiedTime}
+        where id=#{id};
+
+        update sys_role_permission SET status = -1,modified_by=#{ModifiedBy},modified_time=#{ModifiedTime}
+        WHERE role_id=#{id};
+
+        UPDATE sys_user_role SET status = -1,modified_by=#{ModifiedBy},modified_time=#{ModifiedTime}
+        where role_id=#{id};
+
+    </update>
+
+
+    <select id="selectRoleUserPage" resultType="map">
+        select a.user_id as userId,b.login_id as loginId,b.name as userName,b.sex,c.name as orgName
+        from sys_user_role a
+        INNER JOIN sys_user b on a.user_id=b.id and b.status!=-1
+        LEFT JOIN  sys_organization c on b.org_id=c.Id and c.status!=-1
+        where a.status!=-1 AND a.role_id=#{roleId}
+        <if test="userName!=''">
+            and b.name like concat('%',#{userName},'%')
+        </if>
+        <if test="loginId!=''">
+            and b.login_id like concat('%',#{loginId},'%')
+        </if>
+    </select>
+
+    <select id="getUserCount" resultType="int">
+        SELECT count(*) from sys_user_role
+        where status!=-1 AND role_id=#{roleId} and user_id=#{userId}
+    </select>
+
+    <delete id="deletePermissionsByRoleId">
+
+        update sys_role_permission SET status = -1,modified_by=#{ModifiedBy},modified_time=#{ModifiedTime}
+        WHERE role_id=#{id}
+
+    </delete>
+
+    <update id="deleteUser">
+
+        UPDATE sys_user_role SET status = -1,modified_by=#{ModifiedBy},modified_time=#{ModifiedTime}
+        where role_id=#{roleId} and user_id=#{userId}
+
+    </update>
+
+    <select id="getUserRoles" resultType="yhsoft.tax.security.model.RoleInfo">
+        SELECT a.id as roleId,a.name as roleName
+        from sys_role a
+        where a.status=1
+        and exists(select NULL from sys_user_role ur where ur.status!=-1 AND ur.role_id=a.id and ur.user_id=#{userId})
+    </select>
+
+    <select id="existsRoleName" resultType="int">
+        SELECT count(*) from sys_role where status=1 and name=#{roleName}
+        <if test="selfRoleId!=null and selfRoleId!=''">
+            and id!=#{selfRoleId}
+        </if>
+    </select>
+</mapper>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="common/base::headerFragment('')">
+
+</head>
+
+<link rel="stylesheet" type="text/css" th:href="@{/js/zTree/css/zTreeStyle/zTreeStyle.css}"/>
+
+<script type="text/javascript" th:src="@{/js/zTree/js/jquery.ztree.all.js}"></script>
+
+<body>
+<div id="form_select_dialog_user" class="layui-fluid">
+    <div class="layui-row">
+        <div class="layui-col-md2 layui-col-sm2">
+            <fieldset class="layui-elem-field">
+                <legend>组织机构树</legend>
+                <div class="layui-field-box ">
+                    <ul id="selectuser-orgtree" class="ztree ztree-disable-root"></ul>
+                </div>
+            </fieldset>
+        </div>
+        <div class="layui-col-md10 layui-col-sm10">
+            <div class="search-form">
+                <blockquote class="layui-elem-quote">
+                    <form id="form1" class="layui-form">
+                        <input name="orgId" type="hidden"/>
+                        <div class="layui-inline">
+                            <label class="layui-form-label">登录名：</label>
+                            <div class="layui-input-inline">
+                                <input name="loginId" class="layui-input" type="text" style="width:150px;"/>
+                            </div>
+                        </div>
+
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style=";"> 姓名：</label>
+                            <div class="layui-input-inline">
+                                <input name="name" class="layui-input" type="text" style="width:150px;"/>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <label class="layui-form-label" style=";"> 性别：</label>
+                            <div class="layui-input-inline" style="width: 80px;">
+                                <select id="selSex" name="sex">
+                                    <option value="">全部</option>
+                                    <option value="M">男</option>
+                                    <option value="F">女</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="layui-inline search-form-button">
+                            <div class="layui-input-inline">
+                                <button class="layui-btn"
+                                        onclick="return zwb.util.lay.reloadTable('table1')"><i
+                                        class="layui-icon">&#xe615;</i></button>
+                            </div>
+                        </div>
+                    </form>
+                </blockquote>
+            </div>
+            <div class="data-list">
+                <table id="table1" _formId="#form1" style="display: none;"
+                       _sql="zhuang.upms.modules.core.mapper.User.selectPage"
+                       lay-data="{height:'full-150'}"
+                >
+                    <thead>
+                    <tr>
+                        <th lay-data="{checkbox:true}"></th>
+                        <th lay-data="{field:'loginId', width:100, sort: true}">登录名</th>
+                        <th lay-data="{field:'name', width:150}">姓名</th>
+                        <th lay-data="{field:'sex', width:80, sort: true,templet:'#tplSex'}">性别</th>
+                        <th lay-data="{field:'orgName', width:200}">所属部门</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div style="height: 60px;">
+        <div class="selected-container" style="height: 90%;">
+            <ul>
+            </ul>
+        </div>
+    </div>
+</div>
+</body>
+
+<script type="text/html" id="tplSex">
+    {{# if(d.sex=='F'){ }}
+    女
+    {{# }else if(d.sex=='M'){ }}
+    男
+    {{# }else{ }}
+    未知
+    {{# } }}
+</script>
+
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    var isSingle = /*[[${#httpServletRequest.getParameter('isSingle')}]]*/null;
+    layui.use(['form', 'table', 'layer'], function () {
+        var table = layui.table;
+
+        $("#table1").show().addClass("layui-table");
+        zwb.util.lay.initTable();
+        table.set({
+            done: function (res, curr, count) {
+                var selectedArray = getSelectedArray();
+                var selectedRowIndexArray = [];
+                for (var i = 0; i < res.data.length; i++) {
+                    for (var j = 0; j < selectedArray.length; j++) {
+                        if (selectedArray[j].value == res.data[i].id) {
+                            selectedRowIndexArray.push(i);
+                        }
+                    }
+                }
+                for (var i = 0; i < selectedRowIndexArray.length; i++) {
+                    $(".layui-table").find("tbody tr[data-index=" + selectedRowIndexArray[i] + "] div.layui-form-checkbox").click();
+                }
+            }
+        });
+        table.init();
+        renderSelectUserOrgTree();
+        table.on('checkbox(table1)', function (obj) {
+            debugger;
+            if (obj.type == "all") {
+                var tableRows = layui.table.cache["table1"];
+                for (var i = 0; i < tableRows.length; i++) {
+                    syncSelectedContainer(tableRows[i].name, tableRows[i].id, obj.checked);
+                }
+            } else {
+                syncSelectedContainer(obj.data.name, obj.data.id, obj.checked);
+            }
+        });
+    });
+
+    function syncSelectedContainer(text, value, checked) {
+        var $liChecked = $("#form_select_dialog_user").find(".selected-container ul li[val=" + value + "]");
+        if (checked) {
+            if ($liChecked.length > 0) return;
+            var $li = $("<li>");
+            $li.html(text);
+            $li.attr("val", value);
+            $li.attr("title", "双击删除");
+            $li.dblclick(function () {
+                var tableRows = layui.table.cache["table1"];
+                var rowIndex;
+                for (var i = 0; i < tableRows.length; i++) {
+                    if (tableRows[i].id == $(this).attr("val")) {
+                        rowIndex = tableRows[i].LAY_TABLE_INDEX;
+                    }
+                }
+                var $trUnchecked = $(".layui-table").find("tbody tr[data-index='" + rowIndex + "']");
+                $trUnchecked.find("div.layui-form-checkbox").click();
+                $(this).remove();
+            });
+            $ul = $("#form_select_dialog_user").find(".selected-container ul");
+            if (isSingle) {
+                $ul.html("");
+            }
+            $ul.append($li);
+        } else {
+            $liChecked.remove();
+        }
+    }
+
+    function renderSelectUserOrgTree() {
+        var tree = zwb.util.ui.renderZTree("selectuser-orgtree", "zhuang.upms.modules.core.mapper.Organization.getTreeNodes",
+            {
+                isAsync: true,
+                onClickHandler: function (event, treeId, treeNode) {
+                    if (treeNode.level == 0) {
+                        $("[name=orgId]").val("");
+                    } else {
+                        $("[name=orgId]").val(treeNode.id);
+                    }
+                    zwb.util.lay.reloadTable("table1");
+                }, rootName: "组织机构"
+            })
+    }
+
+    function getSelectedArray() {
+        var arr = [];
+        $("#form_select_dialog_user").find(".selected-container ul li").each(function () {
+            arr.push({text: $(this).html(), value: $(this).attr("val")});
+        });
+        return arr;
+    };
+    /*]]>*/
+</script>
+</html>

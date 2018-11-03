@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="common/base::headerFragment('')">
+
+</head>
+
+<link rel="stylesheet" type="text/css" th:href="@{/js/zTree/css/zTreeStyle/zTreeStyle.css}"/>
+
+<script type="text/javascript" th:src="@{/js/zTree/js/jquery.ztree.all.js}"></script>
+
+<body>
+<div>
+    <div class="search-form">
+        <blockquote class="layui-elem-quote">
+            <form id="form1" class="layui-form">
+                <input name="roleId" type="hidden" th:value="${#httpServletRequest.getParameter('roleId')}"/>
+                <div class="layui-inline">
+                    <label class="layui-form-label">登录名：</label>
+                    <div class="layui-input-inline">
+                        <input name="loginId" class="layui-input" type="text" style="width:150px;"/>
+                    </div>
+                </div>
+
+                <div class="layui-inline">
+                    <label class="layui-form-label" style=";"> 姓名：</label>
+                    <div class="layui-input-inline">
+                        <input name="userName" class="layui-input" type="text" style="width:150px;"/>
+                    </div>
+                </div>
+
+                <div class="layui-inline search-form-button">
+                    <div class="layui-input-inline">
+                        <button class="layui-btn" onclick="return zwb.util.lay.reloadTable('table1')"><i
+                                class="layui-icon">&#xe615;</i></button>
+                    </div>
+                </div>
+            </form>
+        </blockquote>
+    </div>
+    <div class="data-list">
+        <table id="table1" class="layui-table" _formId="#form1" _toolbar="#toolbar1"
+               _sql="zhuang.upms.modules.core.mapper.Role.selectRoleUserPage"
+               _order="a.user_id">
+            <thead>
+            <tr>
+                <th lay-data="{checkbox:true}"></th>
+                <th lay-data="{field:'loginId', width:150, sort: true}">登录名</th>
+                <th lay-data="{field:'userName', width:150}">姓名</th>
+                <th lay-data="{field:'sex', width:80, sort: true,templet:'#tplSex'}">性别</th>
+                <th lay-data="{field:'orgName'}">所属部门</th>
+            </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+</body>
+
+<script type="text/html" id="toolbar1">
+    <button class="layui-btn layui-btn-sm" onclick="return openSelectUser();">添加用户</button>
+    <button class="layui-btn layui-btn-sm" onclick="return doDeleteUsers();">删除用户</button>
+</script>
+
+<script type="text/html" id="tplSex">
+    {{# if(d.sex=='F'){ }}
+    女
+    {{# }else if(d.sex=='M'){ }}
+    男
+    {{# }else{ }}
+    未知
+    {{# } }}
+</script>
+
+<script type="text/javascript" th:inline="javascript">
+    /*<![CDATA[*/
+    var roleId = /*[[${#httpServletRequest.getParameter('roleId')}]]*/null;
+
+    zwb.util.lay.initTable();
+    layui.use(['form', 'table', 'layer'], function () {
+        var table = layui.table;
+        var layer = layui.layer;
+    });
+
+    function openSelectUser() {
+        parent.zwb.util.lay.openSelectDialogUser(function (arr) {
+            var data = {id: roleId, idList: []};
+            for (var i = 0; i < arr.length; i++) {
+                data.idList.push(arr[i].value);
+            }
+            zwb.util.post("/core/role/addUsers", zwb.util.getPostData(data), function (data) {
+                if (!zwb.util.lay.handleException(data)) return false;
+                zwb.util.lay.reloadTable();
+            })
+        })
+    }
+
+    function doSave(index, layero, originOpener) {
+        parent.layui.layer.close(index);
+    }
+
+    function doDeleteUsers() {
+        var checkStatus = layui.table.checkStatus('table1');
+        var userIds = [];
+
+        for (var i = 0; i < checkStatus.data.length; i++) {
+            userIds.push(checkStatus.data[i].userId);
+        }
+        var args = {id: roleId, idList: userIds};
+        zwb.util.post("/core/role/deleteUsers", zwb.util.getPostData(args), function (data) {
+            if (!zwb.util.lay.handleException(data)) return false;
+            zwb.util.lay.reloadTable("table1");
+        });
+    };
+    /*]]>*/
+</script>
+</html>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?><!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zhuang.upms.modules.core.mapper.User">
+
+    <select id="selectPage" resultType="map">
+
+        select a.id,a.name,a.login_id as loginId,a.sex,a.status,b.name as orgName
+        from sys_user a
+        LEFT JOIN sys_organization b on a.org_id=b.Id and b.status!=-1
+        where a.status!=-1
+        <if test="name!=''">
+            and a.name like concat('%',#{name},'%')
+        </if>
+        <if test="loginId!=''">
+            and a.login_id like concat('%',#{loginId},'%')
+        </if>
+        <if test="sex!=''">
+            and a.sex =#{sex}
+        </if>
+        <if test="orgId!=''">
+            and a.org_id=#{orgId}
+        </if>
+        <if test="status!=null">
+            and a.status=#{status}
+        </if>
+
+    </select>
+
+    <select id="getById" resultType="yhsoft.tax.modules.core.model.UserExt">
+
+		select a.*,b.name as OrgName
+		from sys_user a
+		LEFT JOIN sys_organization b on a.org_id=b.Id and b.status!=-1
+		where a.status!=-1 AND a.id=#{id}
+
+	</select>
+
+    <select id="getByLoginId" resultType="yhsoft.tax.modules.core.model.User">
+
+        SELECT a.* from sys_user a where status=1 and login_id=#{loginId}
+
+    </select>
+
+    <update id="deleteById">
+
+        UPDATE sys_user SET status = -1,modified_by=#{ModifiedBy},modified_time=#{ModifiedTime}
+        where id=#{id}
+
+    </update>
+
+    <update id="changePasswordById">
+
+        UPDATE sys_user SET password = #{password},modified_by=#{ModifiedBy},modified_time=#{ModifiedTime}
+        where id=#{id}
+
+    </update>
+
+</mapper>
+

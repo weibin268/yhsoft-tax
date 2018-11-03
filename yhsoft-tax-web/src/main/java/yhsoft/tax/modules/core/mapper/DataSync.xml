@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?><!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="zhuang.upms.modules.core.mapper.DataSync">
+    
+    <select id="getAllSubsystem" resultType="yhsoft.tax.modules.core.model.Subsystem">
+
+        select a.* from sys_subsystem a where a.status=1
+
+    </select>
+
+    <select id="getUserMaxModifiedTime" resultType="date">
+        SELECT ifnull((select max(modified_time) as MaxModifiedTime from sys_user),'1999-01-01');
+    </select>
+    
+    <select id="getUserDataNeedToSync" resultType="yhsoft.tax.modules.core.model.User">
+        SELECT * from sys_user where modified_time>#{MaxModifiedTime}
+    </select>
+
+    <select id="getOrganizationMaxModifiedTime" resultType="date">
+        SELECT ifnull((select max(modified_time) as MaxModifiedTime from sys_organization),'1999-01-01');
+    </select>
+
+    <select id="getOrganizationDataNeedToSync" resultType="yhsoft.tax.modules.core.model.Organization">
+        SELECT * from sys_organization where modified_time>#{MaxModifiedTime}
+    </select>
+
+    <select id="getMenuMaxModifiedTime" resultType="date">
+        SELECT ifnull((select max(modified_time) as MaxModifiedTime from sys_menu),'1999-01-01');
+    </select>
+
+    <select id="getMenuDataNeedToSync" resultType="yhsoft.tax.modules.core.model.Menu">
+        SELECT * from sys_menu where modified_time>#{MaxModifiedTime}
+    </select>
+
+    <select id="getPermissionMaxModifiedTime" resultType="date">
+        SELECT ifnull((select max(ModifiedTime) as MaxModifiedTime from sys_permission),'1999-01-01');
+    </select>
+
+    <select id="getPermissionDataNeedToSync" resultType="yhsoft.tax.modules.core.model.Permission">
+        SELECT * from sys_permission where modified_time>#{MaxModifiedTime}
+    </select>
+
+    <select id="getRoleMaxModifiedTime" resultType="date">
+        SELECT ifnull((select max(modified_time) as MaxModifiedTime from sys_role),'1999-01-01');
+    </select>
+
+    <select id="getRoleDataNeedToSync" resultType="yhsoft.tax.modules.core.model.Role">
+        SELECT * from sys_role where modified_time>#{MaxModifiedTime}
+    </select>
+
+    <select id="getRolePermissionMaxModifiedTime" resultType="date">
+        SELECT ifnull((select max(modified_time) as MaxModifiedTime from sys_role_permission),'1999-01-01');
+    </select>
+
+    <select id="getRolePermissionDataNeedToSync" resultType="yhsoft.tax.modules.core.model.RolePermission">
+        SELECT * from sys_role_permission where ModifiedTime>#{MaxModifiedTime}
+    </select>
+
+    <select id="getUserRoleMaxModifiedTime" resultType="date">
+        SELECT ifnull((select max(modified_time) as MaxModifiedTime from sys_user_role),'1999-01-01');
+    </select>
+
+    <select id="getUserRoleDataNeedToSync" resultType="yhsoft.tax.modules.core.model.UserRole">
+        SELECT * from sys_user_role where modified_time>#{MaxModifiedTime}
+    </select>
+
+</mapper>
