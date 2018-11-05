@@ -27,6 +27,7 @@ public class TaxApiController {
     public Object test() {
        Map map = sqlSession.selectOne("yhsoft.tax.modules.core.mapper.Test.getList");
         System.out.println(map);
+        //AAA
         return "test";
     }
 
