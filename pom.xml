@@ -14,6 +14,7 @@
         <module>yhsoft-common</module>
         <module>yhsoft-ocr</module>
         <module>yhsoft-tax-web</module>
+        <module>zhuang-fileupload</module>
     </modules>
 
     <build>
